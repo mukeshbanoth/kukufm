@@ -1,0 +1,24 @@
+EPISODE LOGLINE: A technician tries to stop a false rescue signal.
+CONTINUITY NOTES: Original synthetic example.
+--- SCRIPT START ---
+SCENE 01
+Scene end: 00:29.00
+**MARA (Shocked):**
+Start: (00:00.00) | End: (00:02.90)
+"Someone sabotaged the lighthouse!"
+**ELI (Alarmed):**
+Start: (00:04.00) | End: (00:08.00)
+"The rescue boat is following that light straight toward the rocks."
+**ACTION:**
+Start: (00:08.00) | End: (00:14.00)
+Mara climbs to the control panel and pulls at a jammed switch.
+**MARA (Desperate):**
+Start: (00:14.00) | End: (00:18.00)
+"The switch is stuck. Can you reach the radio?"
+**ELI (Frightened):**
+Start: (00:21.00) | End: (00:27.00)
+"The radio is dead. Who just locked the door behind us?"
+**SOUND FX:**
+Start: (00:27.00) | End: (00:29.00)
+Cliffhanger sting.
+--- SCRIPT END ---
