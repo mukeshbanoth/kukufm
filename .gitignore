@@ -1,0 +1,9 @@
+input_pack/
+outputs*/
+.cache/
+.env
+.venv/
+__pycache__/
+*.zip
+ASSIGNMENT.pdf
+tmp/

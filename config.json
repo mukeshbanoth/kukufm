@@ -1,0 +1,9 @@
+{
+  "weights": {"hook": 0.28, "cliffhanger": 0.30, "standalone": 0.23, "emotion": 0.08, "retention": 0.11},
+  "model_weight": 0.7,
+  "max_overlap": 0.45,
+  "episode_cap": 2,
+  "hook_repeat_penalty": 0.12,
+  "speaker_repeat_penalty": 0.10,
+  "join_penalty": 0.45
+}
