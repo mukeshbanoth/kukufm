@@ -48,20 +48,25 @@ def render_app(public=False):
     hero_area = st.empty()
     with hero_area.container():
         if not has_results:
-            st.caption(":red[**FROM EPISODES TO EDIT POINTS**]")
-            st.title("Find your next :red[promo].")
-            st.write("Discover the opening that stops the scroll and the ending that leaves a question. "
-                     "Get a ranked shortlist with exact times and screenplay evidence.")
-            sample = st.button("Try the synthetic sample", type="primary",
-                               icon=":material/play_arrow:", key="hero_sample")
-            st.caption("One episode. No API key. A complete result you can explore.")
-            with st.container(border=True):
-                st.caption(":red[**KUKU BRAND FILM**]")
-                st.video(
-                    "https://d1l07mcd18xic4.cloudfront.net/static/brandWebsite/hero_video.mp4",
-                    autoplay=True, muted=True, loop=True, width="stretch",
-                )
-                st.caption("Brand video from kuku.app. The sample and generated promo cuts are available in the workspace below.")
+            introduction, artwork = st.columns([1, 1.3], gap="large", vertical_alignment="center")
+            with introduction:
+                st.caption(":red[**FROM EPISODES TO EDIT POINTS**]")
+                st.title("Find your next :red[promo].")
+                st.write("Discover the opening that stops the scroll and the ending that leaves a question. "
+                         "Get a ranked shortlist with exact times and screenplay evidence.")
+                sample = st.button("Try the synthetic sample", type="primary",
+                                   icon=":material/play_arrow:", key="hero_sample")
+                st.caption("One episode. No API key. A complete result you can explore.")
+            with artwork:
+                posters = st.columns(3, gap="small")
+                for column, number, title in zip(
+                    posters, [1, 2, 3],
+                    ["Flirt Billionaire", "Rowdy Baap Returns", "Undercover Billionaire"],
+                ):
+                    with column:
+                        st.image(str(ROOT / "assets" / f"show-poster-{number}.webp"),
+                                 caption=title, width="stretch")
+                st.caption("Public show artwork from kuku.app.")
             st.space("medium")
             st.header("A shortlist built around :red[the story].", anchor="how-it-works")
             st.caption("Three things to inspect before a cut becomes a promo.")

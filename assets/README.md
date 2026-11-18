@@ -8,4 +8,5 @@ The Kuku marks belong to their respective owner. They identify the company for t
 
 The light-surface variant uses the same vector paths, with the white lettering changed to charcoal for contrast on white. The red dot is preserved.
 
-The landing page embeds the public Kuku brand film at https://d1l07mcd18xic4.cloudfront.net/static/brandWebsite/hero_video.mp4, as referenced by the homepage player. Playback depends on that external host.
+
+The three static show posters are from the public kuku.app homepage, at https://d1l07mcd18xic4.cloudfront.net/static/brandWebsite/Marquee/1.webp and the corresponding 2.webp and 3.webp URLs. The original artwork is preserved.
