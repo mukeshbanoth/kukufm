@@ -1,15 +1,37 @@
 [theme]
 base = "light"
-primaryColor = "#6D28D9"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F5F3FA"
-textColor = "#20202C"
-borderColor = "#E3DFEC"
+primaryColor = "#7C3AED"
+backgroundColor = "#FAF9FD"
+secondaryBackgroundColor = "#F0ECFA"
+textColor = "#202038"
+borderColor = "#DDD5ED"
 baseRadius = "large"
-buttonRadius = "medium"
-font = "sans-serif"
-headingFontWeights = [700, 650, 600, 600, 600, 600]
+buttonRadius = "full"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Manrope:https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap"
+headingFontSizes = ["46px", "30px", "23px", "20px", "18px", "16px"]
+headingFontWeights = [800, 750, 700, 650, 600, 600]
+baseFontSize = 16
+linkColor = "#6D28D9"
+violetColor = "#7C3AED"
+violetTextColor = "#6220BB"
+violetBackgroundColor = "#EBDEFF"
+blueColor = "#2563EB"
+blueTextColor = "#1E40AF"
+blueBackgroundColor = "#DBEAFE"
+greenColor = "#0F766E"
+greenTextColor = "#115E59"
+greenBackgroundColor = "#CCFBF1"
+orangeColor = "#C2410C"
+orangeTextColor = "#9A3412"
+orangeBackgroundColor = "#FFEDD5"
+chartCategoricalColors = ["#7C3AED", "#0F766E", "#DB2777", "#2563EB", "#C2410C"]
+showWidgetBorder = true
+showSidebarBorder = false
 
 [theme.sidebar]
-backgroundColor = "#F5F3FA"
-secondaryBackgroundColor = "#EBE6F3"
+backgroundColor = "#20133D"
+secondaryBackgroundColor = "#30204F"
+textColor = "#F8F4FF"
+primaryColor = "#C4B5FD"
+borderColor = "#4B3867"
