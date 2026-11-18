@@ -9,8 +9,6 @@ from dotenv import load_dotenv
 
 from find_promos import run
 from report import segments_text
-from parser import load_shows
-from promo_motion import render_timeline
 
 ROOT = Path(__file__).resolve().parent
 
@@ -47,9 +45,9 @@ def render_app(public=False):
         else:
             st.caption("SCREENPLAY WORKSPACE")
 
-    if not has_results:
-        intro, preview = st.columns([1.15, 1], gap="large", vertical_alignment="center")
-        with intro:
+    hero_area = st.empty()
+    with hero_area.container():
+        if not has_results:
             st.caption(":red[**FROM EPISODES TO EDIT POINTS**]")
             st.title("Find your next :red[promo].")
             st.write("Discover the opening that stops the scroll and the ending that leaves a question. "
@@ -57,34 +55,32 @@ def render_app(public=False):
             sample = st.button("Try the synthetic sample", type="primary",
                                icon=":material/play_arrow:", key="hero_sample")
             st.caption("One episode. No API key. A complete result you can explore.")
-        with preview:
             with st.container(border=True):
-                st.badge("SAMPLE SCREENPLAY", color="gray", icon=":material/movie:")
-                sample_episode = next(iter(next(iter(load_shows(ROOT / "demo").values())).values()))
-                dialogue = [event for event in sample_episode.events if event.speaker]
-                st.caption(":blue[**OPENING · EPISODE 1**]")
-                st.subheader(dialogue[0].text.strip('"'))
-                st.caption(":red[**ENDING · EPISODE 1**]")
-                st.write(dialogue[-1].text.strip('"'))
-                st.caption("Original synthetic material included with this demo.")
-                render_timeline()
-        st.space("medium")
-        st.header("A shortlist built around :red[the story].", anchor="how-it-works")
-        st.caption("Three things to inspect before a cut becomes a promo.")
-        feature_columns = st.columns(3, gap="medium")
-        for column, number, title, description in [
-            (feature_columns[0], "01", "Open with a hook", "Start on dialogue or action that gives a new viewer a reason to stop."),
-            (feature_columns[1], "02", "Keep the conflict clear", "Use the source quotes and scene context to check what is at stake."),
-            (feature_columns[2], "03", "Leave a question open", "End before the answer, then take the timecodes to your editor."),
-        ]:
-            with column, st.container(border=True):
-                st.caption(f":red[**{number}**] / PROMO CRITERIA")
-                st.subheader(f":red[{title}]")
-                st.write(description)
-        st.space("medium")
-    else:
-        st.title("Your promo :red[shortlist].")
-        st.caption("Compare the cuts, check their context, and take the strongest moments to your editor.")
+                st.caption(":red[**KUKU BRAND FILM**]")
+                autoplay = st.toggle("Play brand film automatically (muted)", value=False, key="brand_autoplay",
+                                     help="Video controls let you play, pause, unmute, and open fullscreen.")
+                st.video(
+                    "https://d1l07mcd18xic4.cloudfront.net/static/brandWebsite/hero_video.mp4",
+                    autoplay=autoplay, muted=True, loop=True, width="stretch",
+                )
+                st.caption("Brand video from kuku.app. The sample and generated promo cuts are available in the workspace below.")
+            st.space("medium")
+            st.header("A shortlist built around :red[the story].", anchor="how-it-works")
+            st.caption("Three things to inspect before a cut becomes a promo.")
+            feature_columns = st.columns(3, gap="medium")
+            for column, number, title, description in [
+                (feature_columns[0], "01", "Open with a hook", "Start on dialogue or action that gives a new viewer a reason to stop."),
+                (feature_columns[1], "02", "Keep the conflict clear", "Use the source quotes and scene context to check what is at stake."),
+                (feature_columns[2], "03", "Leave a question open", "End before the answer, then take the timecodes to your editor."),
+            ]:
+                with column, st.container(border=True):
+                    st.caption(f":red[**{number}**] / PROMO CRITERIA")
+                    st.subheader(f":red[{title}]")
+                    st.write(description)
+            st.space("medium")
+        else:
+            st.title("Your promo :red[shortlist].")
+            st.caption("Compare the cuts, check their context, and take the strongest moments to your editor.")
 
     if st.session_state.pop("focus_next_run", False):
         st.session_state["focus_results"] = True
@@ -164,6 +160,7 @@ def render_app(public=False):
                         status.update(label="Shortlist ready", state="complete", expanded=False)
                         st.session_state["focus_next_run"] = True
                         input_area.empty()
+                        hero_area.empty()
                         st.rerun()
                 except (OSError, ValueError, zipfile.BadZipFile) as error:
                     st.error(str(error), icon=":material/error:")
