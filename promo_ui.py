@@ -15,25 +15,41 @@ ROOT = Path(__file__).resolve().parent
 
 def render_app(public=False):
     st.set_page_config(page_title="Kuku · Promo finder", page_icon=str(ROOT / "assets" / "kuku-icon.png"), layout="wide",
-                       initial_sidebar_state="collapsed")
+                       initial_sidebar_state="expanded")
     if not public:
         load_dotenv()
 
     st.logo(str(ROOT / "assets" / "kuku-logo-light.svg"), size="large", link="https://kuku.app/")
     with st.sidebar:
-        st.caption("PROMO FINDER")
+        st.caption(":red[**PROMO FINDER**]")
+        st.subheader("Your story.\nYour next promo.")
         st.badge("Public demo" if public else "Editor workspace", icon=":material/movie:", color="red")
-        st.write("Find the scene worth sharing.")
-        st.markdown("**Your workflow**")
-        st.markdown(":red[**01**]  Add a screenplay")
-        st.markdown(":red[**02**]  Generate your shortlist")
-        st.markdown(":red[**03**]  Review and export")
-        with st.expander("How the shortlist works"):
-            st.write("Cuts run for 20–60 seconds. The tool scores the opening hook, unresolved ending, "
-                     "clarity, and emotion, then reduces overlap between selections.")
-            st.caption("Scores guide editorial review. Check pacing and context against the footage.")
+        st.space("small")
+        sidebar_posters = st.columns(2, gap="small")
+        for column, poster in zip(sidebar_posters, [4, 6]):
+            with column:
+                st.image(str(ROOT / "assets" / f"show-poster-{poster}.webp"), width="stretch")
+        st.caption("Public Kuku catalogue artwork")
+        st.space("small")
+        st.markdown("**Explore the workspace**")
+        if "promo_results" not in st.session_state:
+            st.markdown(":material/auto_stories: [How it works](#how-it-works)")
+            st.markdown(":material/upload_file: [Upload episodes](#upload-episodes)")
+            st.markdown(":material/help: [Common questions](#questions)")
+        else:
+            st.caption("Use the shortlist, comparison, and export tabs to review this run. "
+                       "Turn off Focus on shortlist to start another.")
+        with st.expander("What makes a good cut?"):
+            st.markdown("**:red[01]  Hook**")
+            st.caption("A reason to stop in the first three seconds.")
+            st.markdown("**:red[02]  Clarity**")
+            st.caption("A conflict a new viewer can follow.")
+            st.markdown("**:red[03]  Cliffhanger**")
+            st.caption("A question that still needs an answer.")
         st.link_button("View the source code", "https://github.com/mukeshbanoth/kukufm",
-                       icon=":material/code:")
+                       icon=":material/code:", width="stretch")
+        st.caption("20–60 second cuts · Timecoded evidence")
+
 
     has_results = "promo_results" in st.session_state
     sample = False
