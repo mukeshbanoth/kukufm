@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from find_promos import run
 from report import segments_text
 from parser import load_shows
+from promo_motion import render_timeline
 
 ROOT = Path(__file__).resolve().parent
 
@@ -66,6 +67,7 @@ def render_app(public=False):
                 st.caption("ENDING · EPISODE 1")
                 st.write(dialogue[-1].text.strip('"'))
                 st.caption("Original synthetic material included with this demo.")
+                render_timeline()
         st.space("medium")
         st.header("A shortlist built around the story.", anchor="how-it-works")
         st.caption("Three things to inspect before a cut becomes a promo.")
@@ -182,7 +184,7 @@ def render_app(public=False):
                          "from the export tab after your run.")
             st.space("medium")
             st.caption("Kuku Promo Finder · Screenplay analysis workspace")
-            st.markdown("[Source code](https://github.com/mukeshbanoth/kukufm)　·　[Kuku website](https://kuku.app/)")
+            st.markdown("[Source code](https://github.com/mukeshbanoth/kukufm)")
             return
 
         results, exports, is_sample = st.session_state["promo_results"]
