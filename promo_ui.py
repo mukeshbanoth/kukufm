@@ -40,7 +40,7 @@ def render_app(public=False):
     has_results = "promo_results" in st.session_state
     sample = False
     with st.container(horizontal=True, vertical_alignment="center"):
-        st.image(str(ROOT / "assets" / "kuku-logo-light.svg"), width=130)
+        st.image(str(ROOT / "assets" / "kuku-logo-light.svg"), width=220)
         st.badge("PROMO FINDER", color="red")
         if not has_results:
             st.markdown("[How it works](#how-it-works)　·　[Upload episodes](#upload-episodes)　·　[Questions](#questions)")
@@ -50,7 +50,7 @@ def render_app(public=False):
     if not has_results:
         intro, preview = st.columns([1.15, 1], gap="large", vertical_alignment="center")
         with intro:
-            st.caption("FROM EPISODES TO EDIT POINTS")
+            st.caption(":red[**FROM EPISODES TO EDIT POINTS**]")
             st.title("Find your next :red[promo].")
             st.write("Discover the opening that stops the scroll and the ending that leaves a question. "
                      "Get a ranked shortlist with exact times and screenplay evidence.")
@@ -62,14 +62,14 @@ def render_app(public=False):
                 st.badge("SAMPLE SCREENPLAY", color="gray", icon=":material/movie:")
                 sample_episode = next(iter(next(iter(load_shows(ROOT / "demo").values())).values()))
                 dialogue = [event for event in sample_episode.events if event.speaker]
-                st.caption("OPENING · EPISODE 1")
+                st.caption(":blue[**OPENING · EPISODE 1**]")
                 st.subheader(dialogue[0].text.strip('"'))
-                st.caption("ENDING · EPISODE 1")
+                st.caption(":red[**ENDING · EPISODE 1**]")
                 st.write(dialogue[-1].text.strip('"'))
                 st.caption("Original synthetic material included with this demo.")
                 render_timeline()
         st.space("medium")
-        st.header("A shortlist built around the story.", anchor="how-it-works")
+        st.header("A shortlist built around :red[the story].", anchor="how-it-works")
         st.caption("Three things to inspect before a cut becomes a promo.")
         feature_columns = st.columns(3, gap="medium")
         for column, number, title, description in [
@@ -78,8 +78,8 @@ def render_app(public=False):
             (feature_columns[2], "03", "Leave a question open", "End before the answer, then take the timecodes to your editor."),
         ]:
             with column, st.container(border=True):
-                st.caption(f"{number} / PROMO CRITERIA")
-                st.subheader(title)
+                st.caption(f":red[**{number}**] / PROMO CRITERIA")
+                st.subheader(f":red[{title}]")
                 st.write(description)
         st.space("medium")
     else:
@@ -170,7 +170,7 @@ def render_app(public=False):
 
         if "promo_results" not in st.session_state:
             st.space("medium")
-            st.header("A few things before you start.", anchor="questions")
+            st.header("A few things :red[before you start].", anchor="questions")
             with st.expander("What can I upload?"):
                 st.write("Use a ZIP containing UTF-8 episode-NNN*.txt screenplay files with scene and event timestamps. "
                          "Download the sample ZIP above to see the format.")
@@ -221,7 +221,7 @@ def render_app(public=False):
                     st.caption(segments_text(row))
                     opening, ending = st.columns(2, gap="medium")
                     with opening:
-                        st.markdown("**:red[:material/bolt: Opening hook]**")
+                        st.markdown("**:blue[:material/bolt: Opening hook]**")
                         st.caption(f"Episode {row['hook']['episode']} · {row['hook']['start']}–{row['hook']['end']}")
                         st.write(row["hook"]["quote"])
                     with ending:
