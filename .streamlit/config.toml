@@ -1,10 +1,10 @@
 [theme]
 base = "dark"
-primaryColor = "#C91625"
-backgroundColor = "#0D0F14"
-secondaryBackgroundColor = "#191D26"
-textColor = "#F3F5FA"
-borderColor = "#394150"
+primaryColor = "#D11A25"
+backgroundColor = "#1C1C1E"
+secondaryBackgroundColor = "#28282B"
+textColor = "#F5F5F5"
+borderColor = "#48484C"
 baseRadius = "large"
 buttonRadius = "medium"
 font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
@@ -12,10 +12,10 @@ headingFont = "Manrope:https://fonts.googleapis.com/css2?family=Manrope:wght@500
 headingFontSizes = ["42px", "30px", "23px", "20px", "18px", "16px"]
 headingFontWeights = [800, 750, 700, 650, 600, 600]
 baseFontSize = 16
-linkColor = "#FF8891"
-redColor = "#FF5966"
-redTextColor = "#FF9CA5"
-redBackgroundColor = "#481923"
+linkColor = "#FF9399"
+redColor = "#FF5964"
+redTextColor = "#FF8E96"
+redBackgroundColor = "#4B2228"
 violetColor = "#B8A1FF"
 violetTextColor = "#C8B7FF"
 violetBackgroundColor = "#312447"
@@ -28,13 +28,13 @@ greenBackgroundColor = "#123D35"
 orangeColor = "#F5AE70"
 orangeTextColor = "#FFC99D"
 orangeBackgroundColor = "#482C1C"
-chartCategoricalColors = ["#FF5966", "#6AA8FF", "#5DD6B8", "#B8A1FF", "#F5AE70"]
+chartCategoricalColors = ["#FF5964", "#F5F5F5", "#B0B0B6", "#FF9399", "#77777F"]
 showWidgetBorder = true
 showSidebarBorder = true
 
 [theme.sidebar]
-backgroundColor = "#11141B"
-secondaryBackgroundColor = "#1D222D"
-textColor = "#F3F5FA"
+backgroundColor = "#161618"
+secondaryBackgroundColor = "#242426"
+textColor = "#F5F5F5"
 primaryColor = "#FF8891"
-borderColor = "#394150"
+borderColor = "#48484C"
