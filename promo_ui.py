@@ -25,12 +25,6 @@ def render_app(public=False):
         st.subheader("Your story.\nYour next promo.")
         st.badge("Public demo" if public else "Editor workspace", icon=":material/movie:", color="red")
         st.space("small")
-        sidebar_posters = st.columns(2, gap="small")
-        for column, poster in zip(sidebar_posters, [4, 6]):
-            with column:
-                st.image(str(ROOT / "assets" / f"show-poster-{poster}.webp"), width="stretch")
-        st.caption("Public Kuku catalogue artwork")
-        st.space("small")
         st.markdown("**Explore the workspace**")
         if "promo_results" not in st.session_state:
             st.markdown(":material/auto_stories: [How it works](#how-it-works)")
@@ -87,12 +81,13 @@ def render_app(public=False):
             st.header("A shortlist built around :red[the story].", anchor="how-it-works")
             st.caption("Three things to inspect before a cut becomes a promo.")
             feature_columns = st.columns(3, gap="medium")
-            for column, number, title, description in [
-                (feature_columns[0], "01", "Open with a hook", "Start on dialogue or action that gives a new viewer a reason to stop."),
-                (feature_columns[1], "02", "Keep the conflict clear", "Use the source quotes and scene context to check what is at stake."),
-                (feature_columns[2], "03", "Leave a question open", "End before the answer, then take the timecodes to your editor."),
+            for column, number, poster, title, description in [
+                (feature_columns[0], "01", 1, "Open with a hook", "Start on dialogue or action that gives a new viewer a reason to stop."),
+                (feature_columns[1], "02", 3, "Keep the conflict clear", "Use the source quotes and scene context to check what is at stake."),
+                (feature_columns[2], "03", 4, "Leave a question open", "End before the answer, then take the timecodes to your editor."),
             ]:
                 with column, st.container(border=True):
+                    st.image(str(ROOT / "assets" / f"show-poster-{poster}.webp"), width="stretch")
                     st.caption(f":red[**{number}**] / PROMO CRITERIA")
                     st.subheader(f":red[{title}]")
                     st.write(description)
