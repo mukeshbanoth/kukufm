@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parent
 
 
 def render_app(public=False):
-    st.set_page_config(page_title="Kuku · Promo finder", page_icon=":material/movie:", layout="wide")
+    st.set_page_config(page_title="Kuku · Promo finder", page_icon=":material/movie:", layout="wide",
+                       initial_sidebar_state="collapsed")
     if not public:
         load_dotenv()
 
@@ -36,7 +37,7 @@ def render_app(public=False):
         st.caption("Built for the Kuku AI Generalist assignment.")
 
     st.markdown(":violet-badge[PROMO FINDER] :blue-badge[EDITOR WORKSPACE]")
-    st.title("Every story has a :violet[standout moment].")
+    st.title("Find the moment. :violet[Keep them watching.]")
     st.write("Turn timestamped episodes into ranked cuts, with the hook, ending, and exact edit points.")
     if public:
         st.caption("Offline scoring · No API key needed · Original synthetic sample included")
@@ -46,30 +47,41 @@ def render_app(public=False):
         st.badge("Source-backed quotes", icon=":material/format_quote:", color="blue")
         st.badge("Editor-ready exports", icon=":material/download:", color="green")
 
-    inputs, workspace = st.columns([1, 2], gap="large")
-    with inputs:
+    has_results = "promo_results" in st.session_state
+    if st.session_state.pop("focus_next_run", False):
+        st.session_state["focus_results"] = True
+    st.session_state.setdefault("focus_results", True)
+    focus = st.toggle("Focus on shortlist", key="focus_results",
+                      help="Use the full workspace for results. Turn off to upload another screenplay.") if has_results else False
+    upload, path, model, provider, top = None, "", "", "offline", 15
+    submitted, sample = False, False
+    if not focus:
         with st.container(border=True):
-            st.subheader(":violet[:material/upload_file:] Start a new run")
-            st.caption("Upload a ZIP of episode-NNN*.txt screenplays.")
-            with st.form("run", border=False):
-                upload = st.file_uploader("Screenplay ZIP", type=["zip"],
-                                          max_upload_size=1 if public else 50,
-                                          help="Public limit is 1 MB unpacked and 100 ZIP entries." if public
-                                          else "Upload the archive containing your episode text files.")
-                path = "" if public else st.text_input("Or use a local folder or ZIP path")
+            st.subheader(":violet[:material/upload_file:] Drop your screenplay ZIP here")
+            st.caption("Drag a ZIP onto the upload area below, or choose Browse files.")
+            upload = st.file_uploader("Screenplay ZIP", type=["zip"],
+                                      max_upload_size=1 if public else 50,
+                                      help="Public limit is 1 MB unpacked and 100 ZIP entries." if public
+                                      else "Upload the archive containing your episode text files.",
+                                      key="screenplay_upload")
+            if upload:
+                st.success(f"{upload.name} is ready · {upload.size / 1024:.1f} KB", icon=":material/check_circle:")
+            with st.expander("Shortlist settings", expanded=not public):
                 top = st.number_input("Promos to shortlist", min_value=1, max_value=50, value=15,
                                       help="The tool may return fewer cuts when overlap limits apply.")
-                provider = "offline" if public else st.selectbox("Provider", ["offline", "gemini", "openai"])
-                model = "" if public else st.text_input("Model override")
-                submitted = st.form_submit_button("Generate shortlist", type="primary",
-                                                 icon=":material/auto_awesome:", width="stretch")
-            st.caption("Just exploring? Run an original one-episode example.")
-            sample = st.button("Try the synthetic sample", icon=":material/play_arrow:", width="stretch")
+                if not public:
+                    path = st.text_input("Or use a local folder or ZIP path")
+                    provider = st.selectbox("Provider", ["offline", "gemini", "openai"])
+                    model = st.text_input("Model override")
+            with st.container(horizontal=True):
+                submitted = st.button("Generate shortlist", type="primary",
+                                      icon=":material/auto_awesome:", disabled=not upload and not path.strip())
+                sample = st.button("Try the synthetic sample", icon=":material/play_arrow:")
             if public:
                 st.caption("Upload scripts you have permission to share. Files are processed in temporary "
                            "storage. Results stay in this browser session until it ends.")
 
-    with workspace:
+    with st.container():
         if submitted or sample:
             st.session_state.pop("promo_results", None)
             if not sample and not upload and not path.strip():
@@ -103,6 +115,8 @@ def render_app(public=False):
                             exports.append((files, bundle.getvalue()))
                         st.session_state["promo_results"] = (results, exports, sample)
                         status.update(label="Shortlist ready", state="complete", expanded=False)
+                        st.session_state["focus_next_run"] = True
+                        st.rerun()
                 except (OSError, ValueError, zipfile.BadZipFile) as error:
                     st.error(str(error), icon=":material/error:")
 
