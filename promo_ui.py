@@ -57,11 +57,9 @@ def render_app(public=False):
             st.caption("One episode. No API key. A complete result you can explore.")
             with st.container(border=True):
                 st.caption(":red[**KUKU BRAND FILM**]")
-                autoplay = st.toggle("Play brand film automatically (muted)", value=False, key="brand_autoplay",
-                                     help="Video controls let you play, pause, unmute, and open fullscreen.")
                 st.video(
                     "https://d1l07mcd18xic4.cloudfront.net/static/brandWebsite/hero_video.mp4",
-                    autoplay=autoplay, muted=True, loop=True, width="stretch",
+                    autoplay=True, muted=True, loop=True, width="stretch",
                 )
                 st.caption("Brand video from kuku.app. The sample and generated promo cuts are available in the workspace below.")
             st.space("medium")
