@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from find_promos import run
 from report import segments_text
+from parser import load_shows
 
 ROOT = Path(__file__).resolve().parent
 
@@ -35,27 +36,45 @@ def render_app(public=False):
         st.link_button("View the source code", "https://github.com/mukeshbanoth/kukufm",
                        icon=":material/code:")
 
-    with st.container(horizontal=True, vertical_alignment="center"):
-        st.image(str(ROOT / "assets" / "kuku-logo.svg"), width=150)
-    st.caption("PROMO FINDER / EDITOR WORKSPACE")
-    st.title("Find your next :red[promo].")
-    st.write("A screenplay in. A ranked cut list out. Review every hook, ending, and edit point in one workspace.")
-    if public:
-        st.caption("Offline scoring · No API key needed · Original synthetic sample included")
-
-    with st.container(horizontal=True):
-        st.badge("20–60 second cuts", icon=":material/timer:", color="red")
-        st.badge("Source-backed quotes", icon=":material/format_quote:", color="gray")
-        st.badge("Editor-ready exports", icon=":material/download:", color="gray")
-
     has_results = "promo_results" in st.session_state
+    sample = False
+    with st.container(horizontal=True, vertical_alignment="center"):
+        st.image(str(ROOT / "assets" / "kuku-logo.svg"), width=130)
+        st.badge("PROMO FINDER", color="red")
+        st.caption("SCREENPLAY WORKSPACE")
+
+    if not has_results:
+        intro, preview = st.columns([1.15, 1], gap="large", vertical_alignment="center")
+        with intro:
+            st.caption("FROM EPISODES TO EDIT POINTS")
+            st.title("Find your next :red[promo].")
+            st.write("Discover the opening that stops the scroll and the ending that leaves a question. "
+                     "Get a ranked shortlist with exact times and screenplay evidence.")
+            sample = st.button("Try the synthetic sample", type="primary",
+                               icon=":material/play_arrow:", key="hero_sample")
+            st.caption("One episode. No API key. A complete result you can explore.")
+        with preview:
+            with st.container(border=True):
+                st.badge("SAMPLE SCREENPLAY", color="gray", icon=":material/movie:")
+                sample_episode = next(iter(next(iter(load_shows(ROOT / "demo").values())).values()))
+                dialogue = [event for event in sample_episode.events if event.speaker]
+                st.caption("OPENING · EPISODE 1")
+                st.subheader(dialogue[0].text.strip('"'))
+                st.caption("ENDING · EPISODE 1")
+                st.write(dialogue[-1].text.strip('"'))
+                st.caption("Original synthetic material included with this demo.")
+        st.space("small")
+    else:
+        st.title("Your promo :red[shortlist].")
+        st.caption("Compare the cuts, check their context, and take the strongest moments to your editor.")
+
     if st.session_state.pop("focus_next_run", False):
         st.session_state["focus_results"] = True
     st.session_state.setdefault("focus_results", True)
     focus = st.toggle("Focus on shortlist", key="focus_results",
                       help="Use the full workspace for results. Turn off to upload another screenplay.") if has_results else False
     upload, path, model, provider, top = None, "", "", "offline", 15
-    submitted, sample = False, False
+    submitted = False
     if not focus:
         with st.container(border=True):
             st.subheader(":red[:material/upload_file:] Drop your screenplay ZIP here")
@@ -77,7 +96,15 @@ def render_app(public=False):
             with st.container(horizontal=True):
                 submitted = st.button("Generate shortlist", type="primary",
                                       icon=":material/auto_awesome:", disabled=not upload and not path.strip())
-                sample = st.button("Try the synthetic sample", icon=":material/play_arrow:")
+                if has_results:
+                    sample = st.button("Try the synthetic sample", icon=":material/play_arrow:", key="rerun_sample")
+                sample_zip = BytesIO()
+                with zipfile.ZipFile(sample_zip, "w", zipfile.ZIP_DEFLATED) as archive:
+                    for episode in sorted((ROOT / "demo").glob("*.txt")):
+                        archive.writestr(episode.name, episode.read_bytes())
+                st.download_button("Download sample ZIP", sample_zip.getvalue(),
+                                   file_name="sample-screenplay.zip", mime="application/zip",
+                                   icon=":material/download:")
             if public:
                 st.caption("Upload scripts you have permission to share. Files are processed in temporary "
                            "storage. Results stay in this browser session until it ends.")
@@ -122,21 +149,16 @@ def render_app(public=False):
                     st.error(str(error), icon=":material/error:")
 
         if "promo_results" not in st.session_state:
-            with st.container(border=True):
-                st.subheader(":red[:material/video_library:] Your next cut starts here")
-                st.write("Generate a shortlist to compare the strongest openings and unresolved endings.")
-                a, b, c = st.columns(3)
-                for column, color, icon, title, description in [
-                    (a, "red", "bolt", "Hook", "An opening that earns attention."),
-                    (b, "gray", "visibility", "Clarity", "A conflict a new viewer can follow."),
-                    (c, "red", "pending", "Cliffhanger", "A reason to watch what happens next."),
-                ]:
-                    with column:
-                        st.markdown(f"### :{color}[:material/{icon}:]")
-                        st.markdown(f"**:{color}[{title}]**")
-                        st.caption(description)
-                st.caption("The synthetic example runs in one click. Your shortlist will appear here with "
-                           "episode times, source quotes, and downloadable reports.")
+            steps = st.columns(3, gap="medium")
+            for column, number, title, description in [
+                (steps[0], "01", "Add your episodes", "Drop a ZIP with timed dialogue, action, and scene notes."),
+                (steps[1], "02", "Compare the cuts", "Review the opening, ending, clarity, and supporting quotes."),
+                (steps[2], "03", "Export your shortlist", "Download the cut list and an editor review sheet."),
+            ]:
+                with column, st.container(border=True):
+                    st.caption(f"STEP {number}")
+                    st.markdown(f"**{title}**")
+                    st.caption(description)
             return
 
         results, exports, is_sample = st.session_state["promo_results"]
@@ -154,7 +176,11 @@ def render_app(public=False):
         if stats.get("provider_errors"):
             st.warning("Model calls stopped. Remaining candidates use heuristic scores.")
 
-        ranked, exports_tab = st.tabs([":material/format_list_numbered: Ranked shortlist", ":material/download: Export results"])
+        ranked, comparison, exports_tab = st.tabs([
+            ":material/format_list_numbered: Ranked shortlist",
+            ":material/table_chart: Compare cuts",
+            ":material/download: Export results",
+        ])
         with ranked:
             st.subheader(":red[:material/auto_awesome:] Your strongest cuts")
             st.caption("Review the top five first. Scores are out of 10 and require an editor’s judgment.")
@@ -189,6 +215,24 @@ def render_app(public=False):
                         column.progress(row["scores"][criterion] / 10,
                                         text=f"{criterion.capitalize()}  {row['scores'][criterion]:.1f}/10")
                     st.caption(row["rank_reason"])
+
+        with comparison:
+            st.subheader("Compare at a glance")
+            st.caption("Criterion scores use a 0–10 scale. The overall score also includes penalties.")
+            if rows:
+                st.dataframe(
+                    [{"Rank": row["rank"], "Edit points": segments_text(row),
+                      "Duration": row["total_duration"], "Hook": row["scores"]["hook"],
+                      "Ending": row["scores"]["cliffhanger"], "Clarity": row["scores"]["standalone"],
+                      "Overall": row["base_score"], "Confidence": row["confidence"]} for row in rows],
+                    hide_index=True, width="stretch",
+                    column_config={
+                        "Duration": st.column_config.NumberColumn(format="%.1f s"),
+                        **{name: st.column_config.ProgressColumn(min_value=0, max_value=10, format="%.1f")
+                           for name in ["Hook", "Ending", "Clarity"]},
+                        "Overall": st.column_config.NumberColumn(format="%.2f"),
+                    },
+                )
 
         with exports_tab:
             st.subheader(":red[:material/download:] Take the shortlist to your editor")
