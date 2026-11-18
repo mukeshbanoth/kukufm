@@ -14,15 +14,15 @@ ROOT = Path(__file__).resolve().parent
 
 
 def render_app(public=False):
-    st.set_page_config(page_title="Kuku · Promo finder", page_icon=":material/movie:", layout="wide",
+    st.set_page_config(page_title="Kuku · Promo finder", page_icon=str(ROOT / "assets" / "kuku-icon.png"), layout="wide",
                        initial_sidebar_state="collapsed")
     if not public:
         load_dotenv()
 
+    st.logo(str(ROOT / "assets" / "kuku-logo.svg"), size="large", link="https://kuku.app/")
     with st.sidebar:
-        st.title(":material/movie: Kuku")
         st.caption("PROMO FINDER")
-        st.badge("Public demo" if public else "Editor workspace", icon=":material/movie:", color="violet")
+        st.badge("Public demo" if public else "Editor workspace", icon=":material/movie:", color="red")
         st.write("Find the scene worth sharing.")
         st.markdown("**Your workflow**")
         st.markdown(":violet[**01**]  Add a screenplay")
@@ -36,14 +36,17 @@ def render_app(public=False):
                        icon=":material/code:")
         st.caption("Built for the Kuku AI Generalist assignment.")
 
-    st.markdown(":violet-badge[PROMO FINDER] :blue-badge[EDITOR WORKSPACE]")
-    st.title("Find the moment. :violet[Keep them watching.]")
-    st.write("Turn timestamped episodes into ranked cuts, with the hook, ending, and exact edit points.")
+    with st.container(horizontal=True, vertical_alignment="center"):
+        st.image(str(ROOT / "assets" / "kuku-logo.svg"), width=150)
+        st.badge("ASSIGNMENT PROTOTYPE", color="gray")
+    st.caption("PROMO FINDER / EDITOR WORKSPACE")
+    st.title("Find your next :red[promo].")
+    st.write("A screenplay in. A ranked cut list out. Review every hook, ending, and edit point in one workspace.")
     if public:
         st.caption("Offline scoring · No API key needed · Original synthetic sample included")
 
     with st.container(horizontal=True):
-        st.badge("20–60 second cuts", icon=":material/timer:", color="violet")
+        st.badge("20–60 second cuts", icon=":material/timer:", color="red")
         st.badge("Source-backed quotes", icon=":material/format_quote:", color="blue")
         st.badge("Editor-ready exports", icon=":material/download:", color="green")
 
@@ -57,7 +60,7 @@ def render_app(public=False):
     submitted, sample = False, False
     if not focus:
         with st.container(border=True):
-            st.subheader(":violet[:material/upload_file:] Drop your screenplay ZIP here")
+            st.subheader(":red[:material/upload_file:] Drop your screenplay ZIP here")
             st.caption("Drag a ZIP onto the upload area below, or choose Browse files.")
             upload = st.file_uploader("Screenplay ZIP", type=["zip"],
                                       max_upload_size=1 if public else 50,
@@ -122,11 +125,11 @@ def render_app(public=False):
 
         if "promo_results" not in st.session_state:
             with st.container(border=True):
-                st.subheader(":violet[:material/video_library:] Your next cut starts here")
+                st.subheader(":red[:material/video_library:] Your next cut starts here")
                 st.write("Generate a shortlist to compare the strongest openings and unresolved endings.")
                 a, b, c = st.columns(3)
                 for column, color, icon, title, description in [
-                    (a, "violet", "bolt", "Hook", "An opening that earns attention."),
+                    (a, "red", "bolt", "Hook", "An opening that earns attention."),
                     (b, "blue", "visibility", "Clarity", "A conflict a new viewer can follow."),
                     (c, "green", "pending", "Cliffhanger", "A reason to watch what happens next."),
                 ]:
@@ -134,7 +137,8 @@ def render_app(public=False):
                         st.markdown(f"### :{color}[:material/{icon}:]")
                         st.markdown(f"**:{color}[{title}]**")
                         st.caption(description)
-                st.caption("Try the sample for a complete result. Upload your episodes when you are ready.")
+                st.caption("The synthetic example runs in one click. Your shortlist will appear here with "
+                           "episode times, source quotes, and downloadable reports.")
             return
 
         results, exports, is_sample = st.session_state["promo_results"]
@@ -147,14 +151,14 @@ def render_app(public=False):
         for column, label, value in zip(metrics, ["Episodes", "Candidates", "Selected cuts", "Run time"],
                                         [stats["episodes"], f"{stats['candidates']:,}", len(rows),
                                          f"{stats['runtime_seconds']:.1f}s"]):
-            column.metric(label, value)
+            column.metric(label, value, border=True)
         st.caption(stats["provider_status"])
         if stats.get("provider_errors"):
             st.warning("Model calls stopped. Remaining candidates use heuristic scores.")
 
         ranked, exports_tab = st.tabs([":material/format_list_numbered: Ranked shortlist", ":material/download: Export results"])
         with ranked:
-            st.subheader(":violet[:material/auto_awesome:] Your strongest cuts")
+            st.subheader(":red[:material/auto_awesome:] Your strongest cuts")
             st.caption("Review the top five first. Scores are out of 10 and require an editor’s judgment.")
             if not rows:
                 st.info("No eligible 20–60 second cuts were found in this input.")
@@ -167,7 +171,7 @@ def render_app(public=False):
                     st.caption(segments_text(row))
                     opening, ending = st.columns(2, gap="medium")
                     with opening:
-                        st.markdown("**:violet[:material/bolt: Opening hook]**")
+                        st.markdown("**:red[:material/bolt: Opening hook]**")
                         st.caption(f"Episode {row['hook']['episode']} · {row['hook']['start']}–{row['hook']['end']}")
                         st.write(row["hook"]["quote"])
                     with ending:
@@ -178,7 +182,7 @@ def render_app(public=False):
                     st.write(row["why"])
                     st.caption(f"Standalone review · {row['standalone']['reason']}")
                     with st.container(horizontal=True):
-                        st.badge(row["hook"]["type"].capitalize(), color="violet")
+                        st.badge(row["hook"]["type"].capitalize(), color="red")
                         st.badge(f"{row['total_duration']:.1f} seconds", color="blue")
                         st.badge(f"{row['confidence'].capitalize()} confidence", color="orange")
                     st.caption(f"{row['scoring_source']} · {row['kind']}")
