@@ -10,3 +10,5 @@ The light-surface variant uses the same vector paths, with the white lettering c
 
 
 The three static show posters are from the public kuku.app homepage, at https://d1l07mcd18xic4.cloudfront.net/static/brandWebsite/Marquee/1.webp and the corresponding 2.webp and 3.webp URLs. The original artwork is preserved.
+
+The lower page uses three additional unchanged public catalogue posters from the same Marquee directory, numbered 4.webp, 5.webp, and 6.webp.

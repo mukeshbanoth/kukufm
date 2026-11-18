@@ -169,7 +169,28 @@ def render_app(public=False):
                     st.error(str(error), icon=":material/error:")
 
         if "promo_results" not in st.session_state:
-            st.space("medium")
+            st.space("large")
+            catalogue_intro, catalogue = st.columns([1, 2], gap="large", vertical_alignment="center")
+            with catalogue_intro:
+                st.caption(":red[**STORIES ON KUKU**]")
+                st.header("Every scene starts with :red[a story].")
+                st.write("Find the turning point in your screenplay. Keep the opening clear, the stakes visible, "
+                         "and the next question unanswered.")
+                st.markdown("[Upload your episodes ↑](#upload-episodes)")
+            with catalogue:
+                artwork_columns = st.columns(3, gap="small")
+                for column, number, title in zip(
+                    artwork_columns, [4, 5, 6],
+                    ["Chuppi", "Influenzza Rocky", "Navy King Ka Badla"],
+                ):
+                    with column:
+                        with st.container(border=True):
+                            st.image(str(ROOT / "assets" / f"show-poster-{number}.webp"),
+                                     width="stretch")
+                            st.markdown(f"**{title}**")
+                st.caption("Artwork from the public Kuku catalogue. These images are separate from your analysis results.")
+
+            st.space("large")
             st.header("A few things :red[before you start].", anchor="questions")
             with st.expander("What can I upload?"):
                 st.write("Use a ZIP containing UTF-8 episode-NNN*.txt screenplay files with scene and event timestamps. "
@@ -183,8 +204,14 @@ def render_app(public=False):
                 st.write("Yes. Download the ranked report, JSON, spreadsheet, run log, and blank review sheet "
                          "from the export tab after your run.")
             st.space("medium")
-            st.caption("Kuku Promo Finder · Screenplay analysis workspace")
-            st.markdown("[Source code](https://github.com/mukeshbanoth/kukufm)")
+            with st.container(border=True):
+                brand, information = st.columns([1, 3], vertical_alignment="center")
+                with brand:
+                    st.image(str(ROOT / "assets" / "kuku-logo-light.svg"), width=110)
+                with information:
+                    st.markdown("**Promo Finder**")
+                    st.caption("Upload · Shortlist · Review · Export")
+                    st.markdown("[Source code](https://github.com/mukeshbanoth/kukufm)")
             return
 
         results, exports, is_sample = st.session_state["promo_results"]
