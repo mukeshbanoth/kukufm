@@ -13,12 +13,17 @@ from report import segments_text
 ROOT = Path(__file__).resolve().parent
 
 
+def _set_home(visible):
+    st.session_state["show_home"] = visible
+
+
 def render_app(public=False):
     st.set_page_config(page_title="Kuku · Promo finder", page_icon=str(ROOT / "assets" / "kuku-icon.png"), layout="wide",
                        initial_sidebar_state="expanded")
     if not public:
         load_dotenv()
 
+    has_results = "promo_results" in st.session_state and not st.session_state.get("show_home", False)
     st.logo(str(ROOT / "assets" / "kuku-logo-light.svg"), size="large", link="https://kuku.app/")
     with st.sidebar:
         st.caption(":red[**PROMO FINDER**]")
@@ -26,13 +31,13 @@ def render_app(public=False):
         st.badge("Public demo" if public else "Editor workspace", icon=":material/movie:", color="red")
         st.space("small")
         st.markdown("**Explore the workspace**")
-        if "promo_results" not in st.session_state:
+        if not has_results:
             st.markdown(":material/auto_stories: [How it works](#how-it-works)")
             st.markdown(":material/upload_file: [Upload episodes](#upload-episodes)")
             st.markdown(":material/help: [Common questions](#questions)")
         else:
             st.caption("Use the shortlist, comparison, and export tabs to review this run. "
-                       "Turn off Focus on shortlist to start another.")
+                       "Choose Back to home to open the landing page.")
         with st.expander("What makes a good cut?"):
             st.markdown("**:red[01]  Hook**")
             st.caption("A reason to stop in the first three seconds.")
@@ -45,15 +50,18 @@ def render_app(public=False):
         st.caption("20–60 second cuts · Timecoded evidence")
 
 
-    has_results = "promo_results" in st.session_state
     sample = False
     with st.container(horizontal=True, vertical_alignment="center"):
         st.image(str(ROOT / "assets" / "kuku-logo-light.svg"), width=220)
         st.badge("PROMO FINDER", color="red")
         if not has_results:
             st.markdown("[How it works](#how-it-works)　·　[Upload episodes](#upload-episodes)　·　[Questions](#questions)")
+            if "promo_results" in st.session_state:
+                st.button("Return to shortlist", icon=":material/arrow_forward:",
+                          on_click=_set_home, args=(False,), key="return_to_results")
         else:
-            st.caption("SCREENPLAY WORKSPACE")
+            st.button("Back to home", icon=":material/arrow_back:",
+                      on_click=_set_home, args=(True,), key="back_to_home")
 
     hero_area = st.empty()
     with hero_area.container():
@@ -170,6 +178,7 @@ def render_app(public=False):
                                     archive.writestr(name, content)
                             exports.append((files, bundle.getvalue()))
                         st.session_state["promo_results"] = (results, exports, sample)
+                        st.session_state["show_home"] = False
                         status.update(label="Shortlist ready", state="complete", expanded=False)
                         st.session_state["focus_next_run"] = True
                         input_area.empty()
@@ -178,7 +187,7 @@ def render_app(public=False):
                 except (OSError, ValueError, zipfile.BadZipFile) as error:
                     st.error(str(error), icon=":material/error:")
 
-        if "promo_results" not in st.session_state:
+        if "promo_results" not in st.session_state or st.session_state.get("show_home", False):
             st.space("large")
             catalogue_intro, catalogue = st.columns([1, 2], gap="large", vertical_alignment="center")
             with catalogue_intro:
