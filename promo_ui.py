@@ -20,7 +20,7 @@ def render_app(public=False):
     if not public:
         load_dotenv()
 
-    st.logo(str(ROOT / "assets" / "kuku-logo.svg"), size="large", link="https://kuku.app/")
+    st.logo(str(ROOT / "assets" / "kuku-logo-light.svg"), size="large", link="https://kuku.app/")
     with st.sidebar:
         st.caption("PROMO FINDER")
         st.badge("Public demo" if public else "Editor workspace", icon=":material/movie:", color="red")
@@ -39,9 +39,12 @@ def render_app(public=False):
     has_results = "promo_results" in st.session_state
     sample = False
     with st.container(horizontal=True, vertical_alignment="center"):
-        st.image(str(ROOT / "assets" / "kuku-logo.svg"), width=130)
+        st.image(str(ROOT / "assets" / "kuku-logo-light.svg"), width=130)
         st.badge("PROMO FINDER", color="red")
-        st.caption("SCREENPLAY WORKSPACE")
+        if not has_results:
+            st.markdown("[How it works](#how-it-works)　·　[Upload episodes](#upload-episodes)　·　[Questions](#questions)")
+        else:
+            st.caption("SCREENPLAY WORKSPACE")
 
     if not has_results:
         intro, preview = st.columns([1.15, 1], gap="large", vertical_alignment="center")
@@ -63,7 +66,20 @@ def render_app(public=False):
                 st.caption("ENDING · EPISODE 1")
                 st.write(dialogue[-1].text.strip('"'))
                 st.caption("Original synthetic material included with this demo.")
-        st.space("small")
+        st.space("medium")
+        st.header("A shortlist built around the story.", anchor="how-it-works")
+        st.caption("Three things to inspect before a cut becomes a promo.")
+        feature_columns = st.columns(3, gap="medium")
+        for column, number, title, description in [
+            (feature_columns[0], "01", "Open with a hook", "Start on dialogue or action that gives a new viewer a reason to stop."),
+            (feature_columns[1], "02", "Keep the conflict clear", "Use the source quotes and scene context to check what is at stake."),
+            (feature_columns[2], "03", "Leave a question open", "End before the answer, then take the timecodes to your editor."),
+        ]:
+            with column, st.container(border=True):
+                st.caption(f"{number} / PROMO CRITERIA")
+                st.subheader(title)
+                st.write(description)
+        st.space("medium")
     else:
         st.title("Your promo :red[shortlist].")
         st.caption("Compare the cuts, check their context, and take the strongest moments to your editor.")
@@ -75,9 +91,10 @@ def render_app(public=False):
                       help="Use the full workspace for results. Turn off to upload another screenplay.") if has_results else False
     upload, path, model, provider, top = None, "", "", "offline", 15
     submitted = False
+    input_area = st.empty()
     if not focus:
-        with st.container(border=True):
-            st.subheader(":red[:material/upload_file:] Drop your screenplay ZIP here")
+        with input_area.container(), st.container(border=True):
+            st.subheader(":red[:material/upload_file:] Upload your episodes", anchor="upload-episodes")
             st.caption("Drag a ZIP onto the upload area below, or choose Browse files.")
             upload = st.file_uploader("Screenplay ZIP", type=["zip"],
                                       max_upload_size=1 if public else 50,
@@ -144,25 +161,32 @@ def render_app(public=False):
                         st.session_state["promo_results"] = (results, exports, sample)
                         status.update(label="Shortlist ready", state="complete", expanded=False)
                         st.session_state["focus_next_run"] = True
+                        input_area.empty()
                         st.rerun()
                 except (OSError, ValueError, zipfile.BadZipFile) as error:
                     st.error(str(error), icon=":material/error:")
 
         if "promo_results" not in st.session_state:
-            steps = st.columns(3, gap="medium")
-            for column, number, title, description in [
-                (steps[0], "01", "Add your episodes", "Drop a ZIP with timed dialogue, action, and scene notes."),
-                (steps[1], "02", "Compare the cuts", "Review the opening, ending, clarity, and supporting quotes."),
-                (steps[2], "03", "Export your shortlist", "Download the cut list and an editor review sheet."),
-            ]:
-                with column, st.container(border=True):
-                    st.caption(f"STEP {number}")
-                    st.markdown(f"**{title}**")
-                    st.caption(description)
+            st.space("medium")
+            st.header("A few things before you start.", anchor="questions")
+            with st.expander("What can I upload?"):
+                st.write("Use a ZIP containing UTF-8 episode-NNN*.txt screenplay files with scene and event timestamps. "
+                         "Download the sample ZIP above to see the format.")
+                if public:
+                    st.caption("Public demo limits are 1 MB unpacked and 100 ZIP entries.")
+            with st.expander("How are promos selected?"):
+                st.write("The public app scores candidates using screenplay cues, checks cut boundaries, and "
+                         "reduces overlap. Review the evidence against the footage before publishing.")
+            with st.expander("Can I export the results?"):
+                st.write("Yes. Download the ranked report, JSON, spreadsheet, run log, and blank review sheet "
+                         "from the export tab after your run.")
+            st.space("medium")
+            st.caption("Kuku Promo Finder · Screenplay analysis workspace")
+            st.markdown("[Source code](https://github.com/mukeshbanoth/kukufm)　·　[Kuku website](https://kuku.app/)")
             return
 
         results, exports, is_sample = st.session_state["promo_results"]
-        show = st.selectbox("Show", list(results))
+        show = st.selectbox("Show", list(results), key="selected_show")
         rows, stats = results[show]
         files, bundle = exports[list(results).index(show)]
         if is_sample:
